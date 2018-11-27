@@ -16,6 +16,7 @@ import { WebBrowser } from 'expo';
 import { MapView } from 'expo';
 import decodeGeoCode from '../helper_functions/decodeGeoCode'
 import { Constants, Location, Permissions } from 'expo';
+import Geofence from 'react-native-expo-geofence';
 
 import API from '../API'
 
@@ -26,27 +27,53 @@ const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
 
+var poly = [ [51.5214, -0.09108] ,
+
+  [51.51881,  -0.08923],
+   
+  [51.52098, -0.084],
+  
+  [51.52293, -0.08751]
+]
+
+var poly2 =[ [51.52303, -0.09271], 
+  [51.52108, -0.09125], 
+  [51.52391, -0.08919]
+]
+
+
+var point = {
+  coords: [51.521168, -0.087656]
+}
+
+
 export default class HomeScreen extends React.Component {
   
   static navigationOptions = {
     header: null,
   };
 
-  state = { 
-    broadcastPin: "",
-    currentBroadcast: null,
-    polygons: [],
-    currentPosition: {
-      latitude: "",
-      longitude: "",
-      latitudeDelta:"",
-      longitudeDelta:"",
-    },
-    location: null,
-    errorMessage: null
-  };
-  
-  // Helper Function
+  constructor() {
+    super()
+    Geofence.Log = true;
+    this.state = { 
+      broadcastPin: "",
+      currentBroadcast: null,
+      polygons: [],
+      currentPosition: {
+        latitude: "",
+        longitude: "",
+        latitudeDelta:"",
+        longitudeDelta:"",
+      },
+      location: null,
+      errorMessage: null,
+      insideFence: [],
+    };
+
+  }
+
+  // Helper Functions
   getDelta(lat, long, distance) {
     const oneDegreeOfLatitudeInMeters = 111.32 * 1000;
     const latitudeDelta = distance / oneDegreeOfLatitudeInMeters;
@@ -62,7 +89,37 @@ export default class HomeScreen extends React.Component {
       });
   }
 
+  pointInPolygon = (point, polygon) => {
+    // from https://github.com/substack/point-in-polygon
+
+    console.log(point.coords[0], "+", point.coords[1])
+
+    let x = point.coords[0]
+    let y = point.coords[1]
+    let inside = false
+  
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      let xi = polygon[i][0]
+      let yi = polygon[i][1]
+      let xj = polygon[j][0]
+      let yj = polygon[j][1]
+      let intersect = ((yi > y) !== (yj > y)) &&
+                      (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+      if (intersect) inside = !inside
+    }
+
+    console.log("POINT IN POLYGON?", inside)
+  
+    return inside
+  }
+
+  
+
+
+  /////////////////////////////////////////////
+
   componentWillMount() {
+   
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -70,6 +127,19 @@ export default class HomeScreen extends React.Component {
     } else {
       this.getLocationAsync();
     }
+
+  }
+
+  
+  componentDidMount() {
+    Location.watchPositionAsync({
+      enableHighAccuracy: true,
+      distanceInterval: 10,
+    }, NewLocation => {
+        let coords = NewLocation.coords;
+        this.getDelta(coords.latitude, coords.longitude, 1000)
+
+   }) 
   }
 
   getLocationAsync = async () => {
@@ -90,7 +160,6 @@ export default class HomeScreen extends React.Component {
     this.getDelta(lat, long, 1000)
 
   };
-
 
 
   getGeoFencesFromBroadCast = (broadcast) => {
@@ -130,6 +199,7 @@ export default class HomeScreen extends React.Component {
         this.getGeoFencesFromBroadCast(broadcast)
         this.setState({
           currentBroadcast: broadcast 
+
         })
       })
   } 
@@ -144,9 +214,9 @@ export default class HomeScreen extends React.Component {
   
   render() {
    
-
+    // console.log("TESTING GEOFENCE:", this.state.insideFence)
     console.log("Hello from inside HomeScreen render() :", this.state.polygons)
-    console.log("COORDS OBJECT:", this.state.location && this.state.location.coords)
+    // console.log("COORDS OBJECT:", this.state.location && this.state.location.coords)
 
     return (
       <View style={styles.container}>
@@ -180,10 +250,11 @@ export default class HomeScreen extends React.Component {
             <MapView
               style={{ flex: 1 }}
               initialRegion={
-                this.state.currentPosition
+                this.state.currentPosition   
               }
             > 
             {this.state.polygons && this.renderPolygonsOnMap()}
+            {this.pointInPolygon(point, poly)}
               <MapView.Marker
                 coordinate={this.marker()}
                 title="You"
