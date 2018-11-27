@@ -21,7 +21,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "branch": {
+          "apiKey": "AIzaSyDAzKVo3LgrtUNJXFExLMK8MzPU2fd1nOM"
+        }
+      }
     }
   }
 }
