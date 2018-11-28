@@ -10,7 +10,10 @@ import {
   View,
   TextInput,  
   Button,
-  Dimensions
+  Dimensions,
+  Modal,
+  TouchableHighlight,
+  Alert
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import { MapView } from 'expo';
@@ -69,6 +72,7 @@ export default class HomeScreen extends React.Component {
       location: null,
       errorMessage: null,
       insideFence: [],
+      currentMessage: null,
     };
 
   }
@@ -86,13 +90,13 @@ export default class HomeScreen extends React.Component {
         latitudeDelta,
         longitudeDelta,
         },
-      });
+      })
   }
 
   pointInPolygon = (point, polygon) => {
     // from https://github.com/substack/point-in-polygon
 
-    console.log(point.coords[0], "+", point.coords[1])
+    // console.log(point.coords[0], "+", point.coords[1])
 
     let x = point.coords[0]
     let y = point.coords[1]
@@ -108,14 +112,12 @@ export default class HomeScreen extends React.Component {
       if (intersect) inside = !inside
     }
 
-    console.log("POINT IN POLYGON?", inside)
+    // console.log("POINT IN POLYGON?", inside)
   
     return inside
   }
 
   
-
-
   /////////////////////////////////////////////
 
   componentWillMount() {
@@ -130,17 +132,72 @@ export default class HomeScreen extends React.Component {
 
   }
 
-  
   componentDidMount() {
+    console.log("HELLO FROM COMPONENT DID MOUNT")
+
     Location.watchPositionAsync({
       enableHighAccuracy: true,
-      distanceInterval: 10,
+      distanceInterval: 0,
     }, NewLocation => {
+        console.log("NEW LOCATION:", NewLocation)
         let coords = NewLocation.coords;
         this.getDelta(coords.latitude, coords.longitude, 1000)
+        this.checkGeoFence()
 
-   }) 
+   }).then(obj => console.log("RETURN FROM WATCH POSITION ASYNC:", obj))
+
   }
+
+  checkGeoFence = () => {
+    // console.log("Hello from checkGeoFence")
+
+    if (this.state.currentBroadcast) {
+      // console.log("INSIDE IF STATEMENT")
+      const lat = this.state.currentPosition.latitude
+      const long = this.state.currentPosition.longitude
+      const point = { coords: [lat, long] }
+
+      // console.log("[checkGeoFence] CURRENT BROADCAST MESSAGES:", this.state.currentBroadcast.messages)
+      
+      this.state.currentBroadcast.messages.map(message => {
+        // console.log("[checkGeoFence] MESSAGE:", message)
+        const messageContent = message.content
+        // console.log("[checkGeoFence] MESSAGE NAME:", messageContent)
+        const polygon = decodeGeoCode(message.geofence)
+        // console.log("[checkGeoFence] POLYGON:", polygon)
+        let expectedPoly = []
+        // console.log("[checkGeoFence] EXOECTED POLY:", expectedPoly)
+
+        polygon.map(poly => {
+          const arrayOfTwoCoords = [poly.latitude, poly.longitude]
+          expectedPoly = [...expectedPoly, arrayOfTwoCoords]
+        })
+
+        const checkIfInPolygon = this.pointInPolygon(point, expectedPoly)
+
+        console.log("[checkGeoFence]:", checkIfInPolygon)
+
+        if (checkIfInPolygon) {
+          this.setState({
+            currentMessage: messageContent
+          })
+        }
+
+      })
+      
+    }
+
+  }
+
+
+
+  // test = () => {
+  //   const polygon = this.state.polygons[0]
+  //   polygon.map(poly => {
+  //     // console.log("TEST LATITUDE:", poly.latitude)
+  //     // console.log("TEST LONGITUDE:", poly.longitude)
+  //   })
+  // }
 
   getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -151,7 +208,7 @@ export default class HomeScreen extends React.Component {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    console.log("LOCATION OBJECT:", location)
+    // console.log("LOCATION OBJECT:", location)
     
     const lat = location.coords.latitude
     const long = location.coords.longitude
@@ -165,13 +222,14 @@ export default class HomeScreen extends React.Component {
   getGeoFencesFromBroadCast = (broadcast) => {
     let geofenceArray = []
     broadcast.messages.map(message => geofenceArray = [...geofenceArray, message.geofence])
-    console.log("HELLO FROM GET GEOFENCES:", geofenceArray)
+    // console.log("HELLO FROM GET GEOFENCES:", geofenceArray)
     this.makePolygons(geofenceArray)
   }
 
   makePolygons = (geofenceArray) => {
     geofenceArray.map(geofence => {
       const decodedGeofence = decodeGeoCode(geofence)
+      // console.log("DECODED GEO-FENCE:", decodedGeofence)
       this.setState({
         polygons: [...this.state.polygons, decodedGeofence]
       })
@@ -193,14 +251,24 @@ export default class HomeScreen extends React.Component {
   }
 
   onPinSubmit = () => {
-    console.log("HELLOOoooooo")
     API.getBroadcast(this.state.broadcastPin)
       .then(broadcast => {
         this.getGeoFencesFromBroadCast(broadcast)
-        this.setState({
-          currentBroadcast: broadcast 
+        this.setState({ currentBroadcast: broadcast })
 
-        })
+        Location.watchPositionAsync({
+          enableHighAccuracy: true,
+          distanceInterval: 0,
+        }, NewLocation => {
+            console.log("NEW LOCATION:", NewLocation)
+            let coords = NewLocation.coords;
+            this.getDelta(coords.latitude, coords.longitude, 1000)
+            this.checkGeoFence()
+    
+       }).then(obj => console.log("RETURN FROM WATCH POSITION ASYNC:", obj))
+
+
+
       })
   } 
 
@@ -211,11 +279,18 @@ export default class HomeScreen extends React.Component {
     }
   }
 
+  closeModal = () => {
+    this.setState({ currentMessage: null })
+  }
+
   
   render() {
-   
+
+    console.log("CURRENT MESSAGE:", this.state.currentMessage)
+    console.log("CURRENT BROADCAST:", this.state.currentBroadcast)
+    // console.log("POLYGONS:", this.state.polygons)
+    
     // console.log("TESTING GEOFENCE:", this.state.insideFence)
-    console.log("Hello from inside HomeScreen render() :", this.state.polygons)
     // console.log("COORDS OBJECT:", this.state.location && this.state.location.coords)
 
     return (
@@ -254,7 +329,8 @@ export default class HomeScreen extends React.Component {
               }
             > 
             {this.state.polygons && this.renderPolygonsOnMap()}
-            {this.pointInPolygon(point, poly)}
+            {/* {this.pointInPolygon(point, poly)} */}
+            {/* {this.test()} */}
               <MapView.Marker
                 coordinate={this.marker()}
                 title="You"
@@ -265,9 +341,43 @@ export default class HomeScreen extends React.Component {
            </>
         }
 
+        {/* MESSAGE MODAL */}
+        {
+
+          this.state.currentMessage &&
+          <>
+            <Modal
+            animationType="slide"
+            transparent={false}
+            visible={this.state.modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}>
+            <View style={{marginTop: 22}} style={styles.modalView}  >
+              <View>
+                <Text>{this.state.currentMessage}</Text>
+
+                <TouchableHighlight
+                  onPress={() => { this.closeModal() }}>
+                  <Text>Close Message</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </Modal>
+
+        </>
+
+        }
+        
+
+
       </View>
     );
   }
+
+
+
+
 
   _maybeRenderDevelopmentModeWarning() {
     if (__DEV__) {
@@ -327,10 +437,10 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     padding: 5,
   },
-
-
-
-
+  modalView: {
+    textAlign: "center",
+    marginTop: 200,
+  },
 
   developmentModeText: {
     marginBottom: 20,
