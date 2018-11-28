@@ -1,7 +1,7 @@
 class API {
 
     static getBroadcast (pin) {
-        return fetch(`http://localhost:3000/api/v1/broadcastbypin`, {
+        return fetch(`http://278cf36d.ngrok.io/api/v1/broadcastbypin`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -12,3 +12,8 @@ class API {
 }
 
 export default API
+
+
+
+
+// `http://localhost:3000/api/v1/broadcastbypin

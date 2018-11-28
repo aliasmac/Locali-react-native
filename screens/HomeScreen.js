@@ -73,6 +73,7 @@ export default class HomeScreen extends React.Component {
       errorMessage: null,
       insideFence: [],
       currentMessage: null,
+      removeWatchFunction: null,
     };
 
   }
@@ -133,23 +134,25 @@ export default class HomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    console.log("HELLO FROM COMPONENT DID MOUNT")
 
-    Location.watchPositionAsync({
-      enableHighAccuracy: true,
-      distanceInterval: 0,
-    }, NewLocation => {
-        console.log("NEW LOCATION:", NewLocation)
-        let coords = NewLocation.coords;
-        this.getDelta(coords.latitude, coords.longitude, 1000)
-        this.checkGeoFence()
-
-   }).then(obj => console.log("RETURN FROM WATCH POSITION ASYNC:", obj))
-
+    // Location.watchPositionAsync({
+    //   enableHighAccuracy: true,
+    //   distanceInterval: 4,
+    // }, NewLocation => {
+    //     console.log("NEW LOCATION:", NewLocation)
+    //     let coords = NewLocation.coords;
+    //     this.getDelta(coords.latitude, coords.longitude, 1000)
+    //     this.checkGeoFence()
+    // }).then(func => this.setState({ removeWatchFunction: func }))
+ 
   }
+  // 51.521168
+  // -0.087656
+
+
 
   checkGeoFence = () => {
-    // console.log("Hello from checkGeoFence")
+    console.log("Hello from checkGeoFence")
 
     if (this.state.currentBroadcast) {
       // console.log("INSIDE IF STATEMENT")
@@ -175,7 +178,7 @@ export default class HomeScreen extends React.Component {
 
         const checkIfInPolygon = this.pointInPolygon(point, expectedPoly)
 
-        console.log("[checkGeoFence]:", checkIfInPolygon)
+        // console.log("[checkGeoFence]:", checkIfInPolygon)
 
         if (checkIfInPolygon) {
           this.setState({
@@ -207,16 +210,44 @@ export default class HomeScreen extends React.Component {
       });
     }
 
-    let location = await Location.getCurrentPositionAsync({});
-    // console.log("LOCATION OBJECT:", location)
+    let location = await Location.getCurrentPositionAsync({ enableHighAccuracy: true })
+    console.log("LOCATION OBJECT:", location)
     
     const lat = location.coords.latitude
     const long = location.coords.longitude
-    const accuracy = location.coords.accuracy
-
+    
     this.getDelta(lat, long, 1000)
 
+    Location.watchPositionAsync({
+      enableHighAccuracy: true,
+      distanceInterval: 10,
+    }, NewLocation => {
+        console.log("NEW LOCATION:", NewLocation)
+        let coords = NewLocation.coords;
+        this.getDelta(coords.latitude, coords.longitude, 1000)
+        this.checkGeoFence()
+    }).then(func => this.setState({ removeWatchFunction: func }))
+
   };
+
+  // async _getPosition() {
+  //   const {Location, Permissions} = Exponent;
+  //   const {status} = await Permissions.askAsync(Permissions.LOCATION);
+  //   if (status === 'granted') {
+  //     Location.getCurrentPositionAsync({enableHighAccuracy: true}).then((position) => {
+  //       this.setState({lon: position.coords.longitude, lat: position.coords.latitude});
+  //       this.callAPI();
+  //       }).catch((e) => {
+  //        // this one is firing the error instantly
+  //         alert(e + ' Please make sure your location (GPS) is turned on.');
+  //       });
+
+  //   } else {
+  //     throw new Error('Location permission not granted');
+  //   }
+  // }
+
+
 
 
   getGeoFencesFromBroadCast = (broadcast) => {
@@ -251,23 +282,28 @@ export default class HomeScreen extends React.Component {
   }
 
   onPinSubmit = () => {
+
+    if (this.state.currentBroadcast) {
+      this.setState({ currentBroadcast: null })
+    }
+
+
     API.getBroadcast(this.state.broadcastPin)
       .then(broadcast => {
         this.getGeoFencesFromBroadCast(broadcast)
         this.setState({ currentBroadcast: broadcast })
+        this.checkGeoFence()
 
-        Location.watchPositionAsync({
-          enableHighAccuracy: true,
-          distanceInterval: 0,
-        }, NewLocation => {
-            console.log("NEW LOCATION:", NewLocation)
-            let coords = NewLocation.coords;
-            this.getDelta(coords.latitude, coords.longitude, 1000)
-            this.checkGeoFence()
+      //   Location.watchPositionAsync({
+      //     enableHighAccuracy: true,
+      //     distanceInterval: 10,
+      //   }, NewLocation => {
+      //       console.log("NEW LOCATION:", NewLocation)
+      //       let coords = NewLocation.coords;
+      //       this.getDelta(coords.latitude, coords.longitude, 1000)
+      //       this.checkGeoFence()
     
-       }).then(obj => console.log("RETURN FROM WATCH POSITION ASYNC:", obj))
-
-
+      //  }).then(func => this.setState({ removeWatchFunction: func }))
 
       })
   } 
@@ -281,13 +317,14 @@ export default class HomeScreen extends React.Component {
 
   closeModal = () => {
     this.setState({ currentMessage: null })
+
   }
 
   
   render() {
 
-    console.log("CURRENT MESSAGE:", this.state.currentMessage)
-    console.log("CURRENT BROADCAST:", this.state.currentBroadcast)
+    // console.log("CURRENT MESSAGE:", this.state.currentMessage)
+    // console.log("CURRENT BROADCAST:", this.state.currentBroadcast)
     // console.log("POLYGONS:", this.state.polygons)
     
     // console.log("TESTING GEOFENCE:", this.state.insideFence)
@@ -358,7 +395,7 @@ export default class HomeScreen extends React.Component {
                 <Text>{this.state.currentMessage}</Text>
 
                 <TouchableHighlight
-                  onPress={() => { this.closeModal() }}>
+                  onPress={() => this.closeModal()}>
                   <Text>Close Message</Text>
                 </TouchableHighlight>
               </View>
