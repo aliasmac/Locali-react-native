@@ -30,31 +30,31 @@ const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
 
-var poly = [ [51.5214, -0.09108] ,
+// var poly = [ [51.5214, -0.09108] ,
 
-  [51.51881,  -0.08923],
+//   [51.51881,  -0.08923],
    
-  [51.52098, -0.084],
+//   [51.52098, -0.084],
   
-  [51.52293, -0.08751]
-]
+//   [51.52293, -0.08751]
+// ]
 
-var poly2 =[ [51.52303, -0.09271], 
-  [51.52108, -0.09125], 
-  [51.52391, -0.08919]
-]
+// var poly2 =[ [51.52303, -0.09271], 
+//   [51.52108, -0.09125], 
+//   [51.52391, -0.08919]
+// ]
 
 
-var point = {
-  coords: [51.521168, -0.087656]
-}
+// var point = {
+//   coords: [51.521168, -0.087656]
+// }
 
 
 export default class HomeScreen extends React.Component {
   
-  static navigationOptions = {
-    header: null,
-  };
+  // static navigationOptions = {
+  //   header: null,
+  // };
 
   constructor() {
     super()
@@ -114,7 +114,6 @@ export default class HomeScreen extends React.Component {
     }
 
     // console.log("POINT IN POLYGON?", inside)
-  
     return inside
   }
 
@@ -148,7 +147,6 @@ export default class HomeScreen extends React.Component {
   }
   // 51.521168
   // -0.087656
-
 
 
   checkGeoFence = () => {
@@ -191,7 +189,6 @@ export default class HomeScreen extends React.Component {
     }
 
   }
-
 
 
   // test = () => {
@@ -248,8 +245,6 @@ export default class HomeScreen extends React.Component {
   // }
 
 
-
-
   getGeoFencesFromBroadCast = (broadcast) => {
     let geofenceArray = []
     broadcast.messages.map(message => geofenceArray = [...geofenceArray, message.geofence])
@@ -282,7 +277,6 @@ export default class HomeScreen extends React.Component {
   }
 
   onPinSubmit = () => {
-
     if (this.state.currentBroadcast) {
       this.setState({ currentBroadcast: null })
     }
@@ -304,7 +298,6 @@ export default class HomeScreen extends React.Component {
       //       this.checkGeoFence()
     
       //  }).then(func => this.setState({ removeWatchFunction: func }))
-
       })
   } 
 
