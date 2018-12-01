@@ -17,7 +17,7 @@ class AuthLoadingScreen extends Component {
     }
 
     loadApp = async() => {
-        const userToken = await AsyncStorage.getItem('userToken')
+        const userToken = await AsyncStorage.getItem('token')
         this.props.navigation.navigate(userToken ? 'App' : 'Auth')
     }
 
@@ -40,3 +40,4 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     }
 });
+

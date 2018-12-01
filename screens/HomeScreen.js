@@ -30,24 +30,6 @@ const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
 
-// var poly = [ [51.5214, -0.09108] ,
-
-//   [51.51881,  -0.08923],
-   
-//   [51.52098, -0.084],
-  
-//   [51.52293, -0.08751]
-// ]
-
-// var poly2 =[ [51.52303, -0.09271], 
-//   [51.52108, -0.09125], 
-//   [51.52391, -0.08919]
-// ]
-
-
-// var point = {
-//   coords: [51.521168, -0.087656]
-// }
 
 
 export default class HomeScreen extends React.Component {
@@ -56,8 +38,8 @@ export default class HomeScreen extends React.Component {
   //   header: null,
   // };
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     Geofence.Log = true;
     this.state = { 
       broadcastPin: "",
@@ -74,6 +56,7 @@ export default class HomeScreen extends React.Component {
       insideFence: [],
       currentMessage: null,
       removeWatchFunction: null,
+      user: this.props.navigation.state.params 
     };
 
   }
@@ -316,19 +299,14 @@ export default class HomeScreen extends React.Component {
   
   render() {
 
-    // console.log("CURRENT MESSAGE:", this.state.currentMessage)
-    // console.log("CURRENT BROADCAST:", this.state.currentBroadcast)
-    // console.log("POLYGONS:", this.state.polygons)
-    
-    // console.log("TESTING GEOFENCE:", this.state.insideFence)
-    // console.log("COORDS OBJECT:", this.state.location && this.state.location.coords)
+    // const { user } = this.props.navigation.state.params 
 
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
            <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>
-                Hello Ali how are we today?
+                {/* {`Hello ${this.state.user.username} how are we today?`} */}
             </Text>
             <View style={styles.pinInputContainer} >
   

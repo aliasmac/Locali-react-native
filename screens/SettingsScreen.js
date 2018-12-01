@@ -11,7 +11,7 @@ import {
 class SettingsScreen extends React.Component {
 
   static navigationOptions = {
-    title: 'Seetings',
+    title: 'Settings',
   };
 
   signOut = async() => {
@@ -20,8 +20,7 @@ class SettingsScreen extends React.Component {
   }
 
   render() {
-    /* Go ahead and delete ExpoConfigView and replace it with your
-     * content, we just wanted to give you a quick view of your config */
+    
     return (
       <View style={styles.container}>
           <Button title='Sign Out'
