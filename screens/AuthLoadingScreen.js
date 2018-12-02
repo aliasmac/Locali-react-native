@@ -11,16 +11,33 @@ import {
 
 class AuthLoadingScreen extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.loadApp()
     }
 
+    // loadApp = async() => {
+    //     const user = await AsyncStorage.getItem('userObj')
+    //     // const user = await AsyncStorage.getItem('userObj')
+    //     this.props.navigation.navigate( user ? ('HomeScreen', { id: user.id, username: user.username } ) : 'Auth')
+    // }
+
     loadApp = async() => {
+        // let username
+        // const username = await AsyncStorage.getItem('username')
+        // console.log("HELLO FROM LOAD AUTH LOAD SCREEN!!", username)
         const userToken = await AsyncStorage.getItem('token')
-        this.props.navigation.navigate(userToken ? 'App' : 'Auth')
+            // .then( username = await AsyncStorage.getItem('username') )
+        // const userId = await AsyncStorage.getItem('token')
+        
+        this.props.navigation.navigate( userToken ? ('HomeScreen') : 'SignIn')
     }
 
+    // this.props.navigation.navigate('HomeScreen', { username: user.username })
+
+    // , { username: username }
+
+    
 
     render() {
         return (

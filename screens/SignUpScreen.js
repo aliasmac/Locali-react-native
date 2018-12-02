@@ -20,7 +20,7 @@ export default class SignUpScreen extends Component {
         username: '',
         password: '',
         errorMessage: null,
-        // login_failed: false,
+        // signUp_failed: false,
         // showLoading: false
         };
     }
@@ -29,42 +29,19 @@ export default class SignUpScreen extends Component {
         console.log("Hello from SIGNUP")
         const { username, password } = this.state
         API.signUp(username, password)
-            .then(user => 
-                {
+            .then(user =>  {
                 deviceStorage.saveKey("token", user.token)
+                deviceStorage.saveKey("username", user.username)
                 console.log(user)
-                this.props.navigation.navigate('App')
+                this.props.navigation.navigate('HomeScreen', { username: user.username })
             }
             ).catch(error => {
                 this.props.navigation.navigate('Auth')
-                this.setState({ errorMessage: "Sign in failed" })
+                this.setState({ errorMessage: "Sign Up failed" })
             })
     }
 
-    // registerUser() {
-    //     const { email, password, password_confirmation } = this.state;
-    
-    //     this.setState({ error: '', loading: true });
-    
-    //     // NOTE Post to HTTPS only in production
-    //     axios.post("http://localhost:4000/api/v1/sign_up",{
-    //       user: {
-    //         email: email,
-    //         password: password,
-    //         password_confirmation: password_confirmation
-    //       }
-    //     },)
-    //     .then((response) => {
-    //       deviceStorage.saveKey("id_token", response.data.jwt);
-    //       this.props.newJWT(response.data.jwt);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       this.onRegistrationFail();
-    //     });
-    //   }
-
-
+  
     render() {
         const { username, password, email_valid } = this.state;
     
@@ -77,8 +54,8 @@ export default class SignUpScreen extends Component {
               style={styles.bgImage}
             > */}
             {/* { this.state.fontLoaded ? */}
-              <View style={styles.loginView}>
-                <View style={styles.loginTitle}>
+              <View style={styles.signUpView}>
+                <View style={styles.signUpTitle}>
                   {/* <View style={{flexDirection: 'row'}}>
                     <Text style={styles.travelText}>TRAVEL</Text>
                     <Text style={styles.plusText}>+</Text>
@@ -88,7 +65,7 @@ export default class SignUpScreen extends Component {
                   </View> */}
                    <Text style={styles.plusText}>Sign Up</Text>
                 </View>
-                <View style={styles.loginInput}>
+                <View style={styles.signUpInput}>
                   <Input
                     leftIcon={
                       <Icon
@@ -109,7 +86,7 @@ export default class SignUpScreen extends Component {
                     // keyboardType="email-address"
                     returnKeyType="next"               
                     blurOnSubmit={false}
-                    placeholderTextColor="white"
+                    placeholderTextColor='white'
                     errorStyle={{textAlign: 'center', fontSize: 12}}
                     // errorMessage={email_valid ? null : "Please enter a valid email address"}
                   />
@@ -134,35 +111,22 @@ export default class SignUpScreen extends Component {
                     returnKeyType="done"
                     // ref={ input => this.passwordInput = input}
                     blurOnSubmit={true}
-                    placeholderTextColor="white"
+                    placeholderTextColor='white'
                   />
                 </View>
                 <Button
-                  title='Sign In'
+                  title='Sign Up'
                   activeOpacity={1}
                   underlayColor="transparent"
-                  onPress={this.signIn}
+                  onPress={this.signUp}
                 //   loading={showLoading}
                   loadingProps={{size: 'small', color: 'white'}}
                 //   disabled={ !email_valid && password.length < 8}
-                  buttonStyle={{height: 50, width: 250, backgroundColor: 'transparent', borderWidth: 2, borderColor: 'white', borderRadius: 30}}
+                  buttonStyle={{marginTop: -40, height: 50, width: 250, backgroundColor: 'transparent', borderWidth: 2, borderColor: 'white', borderRadius: 30}}
                   containerStyle={{marginVertical: 10}}
                   titleStyle={{fontWeight: 'bold', color: 'white'}}
                   activeOpacity={0.5}
                 />
-                <View style={styles.footerView}>
-                  <Text style={{color: 'grey'}}>
-                    New here?
-                  </Text>
-                  <Button
-                    title="Create an Account"
-                    clear
-                    activeOpacity={0.5}
-                    titleStyle={{color: 'white', fontSize: 15}}
-                    containerStyle={{marginTop: -10}}
-                    onPress={() => console.log('Account created')}
-                  />
-                </View>
               </View> 
               {/* <Text>Loading...</Text>
             } */}
@@ -175,7 +139,9 @@ export default class SignUpScreen extends Component {
     const styles = StyleSheet.create({
       container: {
         flex: 1,
-        backgroundColor: 'blue'
+        backgroundColor: '#030056',
+        alignItems: 'center',
+        justifyContent: 'center',
       },
       bgImage: {
         flex: 1,
@@ -186,28 +152,31 @@ export default class SignUpScreen extends Component {
         justifyContent: 'center',
         alignItems: 'center'
       },
-      loginView: {
-        marginTop: 150,
+      signUpView: {
+        marginTop: -150,
         backgroundColor: 'transparent',
         width: 250,
         height: 400,
       },
-      loginTitle: {
+      signUpTitle: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-      },
+        // backgroundColor: 'green',
+        padding: 0,
+        marginBottom: -150,
+      }, 	
       travelText: {
         color: 'white',
         fontSize: 30,
         // fontFamily: 'bold'
       },
       plusText: {
-        color: 'white',
+        color: '#4c75c2',
         fontSize: 30,
         // fontFamily: 'regular'
       },
-      loginInput: {
+      signUpInput: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'

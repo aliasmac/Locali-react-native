@@ -13,7 +13,9 @@ import {
   Dimensions,
   Modal,
   TouchableHighlight,
-  Alert
+  Alert,
+  ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import { MapView } from 'expo';
@@ -22,6 +24,7 @@ import { Constants, Location, Permissions } from 'expo';
 import Geofence from 'react-native-expo-geofence';
 
 import API from '../API'
+import deviceStorage from '../components/deviceStorage';
 
 const {width, height} = Dimensions.get('window')
 
@@ -40,7 +43,7 @@ export default class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    Geofence.Log = true;
+    // this.loadUsername()
     this.state = { 
       broadcastPin: "",
       currentBroadcast: null,
@@ -56,7 +59,9 @@ export default class HomeScreen extends React.Component {
       insideFence: [],
       currentMessage: null,
       removeWatchFunction: null,
-      user: this.props.navigation.state.params 
+      username: null,
+      userId: null,
+      loading: true,
     };
 
   }
@@ -80,8 +85,6 @@ export default class HomeScreen extends React.Component {
   pointInPolygon = (point, polygon) => {
     // from https://github.com/substack/point-in-polygon
 
-    // console.log(point.coords[0], "+", point.coords[1])
-
     let x = point.coords[0]
     let y = point.coords[1]
     let inside = false
@@ -104,32 +107,36 @@ export default class HomeScreen extends React.Component {
   /////////////////////////////////////////////
 
   componentWillMount() {
-   
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
       });
     } else {
       this.getLocationAsync();
+      this.loadUsername()
     }
-
   }
+
+  loadUsername = async() => {
+    const username = await AsyncStorage.getItem('username')
+    this.setState({ username })
+  }
+
+ 
 
   componentDidMount() {
-
-    // Location.watchPositionAsync({
-    //   enableHighAccuracy: true,
-    //   distanceInterval: 4,
-    // }, NewLocation => {
-    //     console.log("NEW LOCATION:", NewLocation)
-    //     let coords = NewLocation.coords;
-    //     this.getDelta(coords.latitude, coords.longitude, 1000)
-    //     this.checkGeoFence()
-    // }).then(func => this.setState({ removeWatchFunction: func }))
- 
+    
   }
-  // 51.521168
-  // -0.087656
+
+  // getUsername = async() => {
+  //       const user = await AsyncStorage.getItem('userObj')
+  //       // const user = await AsyncStorage.getItem('userObj')
+  //       this.props.navigation.navigate( user ? ('HomeScreen', { id: user.id, username: user.username } ) : 'Auth')
+  //   }
+
+
+
+  
 
 
   checkGeoFence = () => {
@@ -174,14 +181,6 @@ export default class HomeScreen extends React.Component {
   }
 
 
-  // test = () => {
-  //   const polygon = this.state.polygons[0]
-  //   polygon.map(poly => {
-  //     // console.log("TEST LATITUDE:", poly.latitude)
-  //     // console.log("TEST LONGITUDE:", poly.longitude)
-  //   })
-  // }
-
   getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
@@ -209,24 +208,6 @@ export default class HomeScreen extends React.Component {
     }).then(func => this.setState({ removeWatchFunction: func }))
 
   };
-
-  // async _getPosition() {
-  //   const {Location, Permissions} = Exponent;
-  //   const {status} = await Permissions.askAsync(Permissions.LOCATION);
-  //   if (status === 'granted') {
-  //     Location.getCurrentPositionAsync({enableHighAccuracy: true}).then((position) => {
-  //       this.setState({lon: position.coords.longitude, lat: position.coords.latitude});
-  //       this.callAPI();
-  //       }).catch((e) => {
-  //        // this one is firing the error instantly
-  //         alert(e + ' Please make sure your location (GPS) is turned on.');
-  //       });
-
-  //   } else {
-  //     throw new Error('Location permission not granted');
-  //   }
-  // }
-
 
   getGeoFencesFromBroadCast = (broadcast) => {
     let geofenceArray = []
@@ -293,20 +274,25 @@ export default class HomeScreen extends React.Component {
 
   closeModal = () => {
     this.setState({ currentMessage: null })
-
   }
 
   
   render() {
 
-    // const { user } = this.props.navigation.state.params 
-
     return (
+
+      // this.state.loading ? 
+
+      // <View style={styles.container}>
+      //           <ActivityIndicator />
+      //       </View> :
+
+
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
            <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>
-                {/* {`Hello ${this.state.user.username} how are we today?`} */}
+                {`Hello ${this.state.username} how are we today?`}
             </Text>
             <View style={styles.pinInputContainer} >
   

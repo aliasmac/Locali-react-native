@@ -13,19 +13,13 @@ class App extends React.Component {
     }
 
   }
-  
-  // params = () => {
-  //   this.props.navigation.getParam(user, null)
-  // }
+
 
   render() {
-
-    
 
       return (
           <AppNavigator />
       );
-    
 
   }
 }

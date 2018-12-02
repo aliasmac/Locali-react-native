@@ -27,48 +27,23 @@ export default class LoginScreen1 extends Component {
         };
     }
     
-    signIn = async () => {
-        console.log("Hello from signIn")
-        const { username, password } = this.state
-        API.signIn(username, password)
-            .then(user => 
-                {
-                deviceStorage.saveKey("token", user.token)
-                console.log("SIGN IN:", user)
-                this.props.navigation.navigate('HomeScreen', {...user})
-            }
-            ).catch(error => {
-                this.props.navigation.navigate('Auth')
-                this.setState({ errorMessage: "Sign in failed" })
-            })
-    }
 
-    // async () => {
-    //     await AsyncStorage.setItem('user', user.token)
-    //     this.props.navigation.navigate('App', { user: user }) 
-        
+  signIn = async () => {
+    console.log("Hello from signIn")
+    const { username, password } = this.state
+    API.signIn(username, password)
+        .then(user => {
+            deviceStorage.saveKey("token", user.token)
+            deviceStorage.saveKey("username", user.username)
+            console.log("SIGN IN:", user)
+            this.props.navigation.navigate('HomeScreen', { username: user.username })
+        }).catch(error => {
+            this.props.navigation.navigate('Auth')
+            this.setState({ errorMessage: "Sign in failed" })
+        })
+  }
 
-    // loginUser() {
-    //     const { email, password, password_confirmation } = this.state;
-    
-    //     this.setState({ error: '', loading: true });
-    
-    //     // NOTE Post to HTTPS only in production
-    //     axios.post("http://localhost:4000/api/v1/sign_in",{
-    //         email: email,
-    //         password: password
-    //     })
-    //     .then((response) => {
-    //       deviceStorage.saveKey("id_token", response.data.jwt);
-    //       this.props.newJWT(response.data.jwt);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       this.onLoginFail();
-    //     });
-    //   }
-
-
+  
 
   render() {
     const { username, password, email_valid } = this.state;
@@ -165,7 +140,7 @@ export default class LoginScreen1 extends Component {
                 activeOpacity={0.5}
                 titleStyle={{color: 'white', fontSize: 15}}
                 containerStyle={{marginTop: -10}}
-                onPress={() => console.log('Account created')}
+                onPress={() => this.props.navigation.navigate('SignUp') }
               />
             </View>
           </View> 
@@ -180,7 +155,9 @@ export default class LoginScreen1 extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'blue'
+    backgroundColor: '#030056',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bgImage: {
     flex: 1,
@@ -192,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   loginView: {
-    marginTop: 150,
+    marginTop: -100,
     backgroundColor: 'transparent',
     width: 250,
     height: 400,
@@ -201,6 +178,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    // backgroundColor: 'green',
+    padding: 0,
+    marginBottom: -50,
   },
   travelText: {
     color: 'white',
@@ -208,7 +188,7 @@ const styles = StyleSheet.create({
     // fontFamily: 'bold'
   },
   plusText: {
-    color: 'white',
+    color: '#4c75c2',
     fontSize: 30,
     // fontFamily: 'regular'
   },

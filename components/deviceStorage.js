@@ -3,31 +3,58 @@ import { AsyncStorage } from 'react-native';
 const deviceStorage = {
 
   async saveKey(key, valueToSave) {
-    console.log("save key")
+    console.log("DEVICE STORAGE")
+    console.log("KEY:", key)
+    console.log("VALUE:", valueToSave)
     try {
       await AsyncStorage.setItem(key, valueToSave);
+    } catch (error) {
+      console.log('AsyncStorage Error (saveKey): ' + error.message);
+    }
+  },
+
+  // 'token'
+  // 'userId'
+
+  async loadJWT() {
+    try {
+      const value = await AsyncStorage.getItem('token');
+      if (value !== null) {
+        this.setState({
+          jwt: value,
+          // loading: false
+        });
+      }
+      // else {
+      //   this.setState({
+      //     loading: false
+      //   });
+      // }
     } catch (error) {
       console.log('AsyncStorage Error: ' + error.message);
     }
   },
 
-  async loadJWT() {
+  // id || userName
+
+  async loadUsername() {
     try {
-      const value = await AsyncStorage.getItem('id_token');
+      const value = await AsyncStorage.getItem('username');
       if (value !== null) {
         this.setState({
-          jwt: value,
-          loading: false
+          username: value,
         });
       } else {
         this.setState({
-          loading: false
+          username: false,
         });
       }
     } catch (error) {
       console.log('AsyncStorage Error: ' + error.message);
     }
   },
+
+
 
   async deleteJWT() {
     try{
