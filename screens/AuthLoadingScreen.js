@@ -36,7 +36,6 @@ class AuthLoadingScreen extends Component {
     // this.props.navigation.navigate('HomeScreen', { username: user.username })
 
     // , { username: username }
-
     
 
     render() {
