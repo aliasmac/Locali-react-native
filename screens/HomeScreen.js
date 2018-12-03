@@ -241,9 +241,19 @@ export default class HomeScreen extends React.Component {
   }
 
   onPinSubmit = () => {
+
+    // so that we can set new broadcast
     if (this.state.currentBroadcast) {
-      this.setState({ currentBroadcast: null })
+      this.setState({
+        currentBroadcast: null,
+        // polygons: null,
+      })
     }
+
+    this.setState({ 
+      broadcastPin: "",
+      polygons: [],
+    })
 
 
     API.getBroadcast(this.state.broadcastPin)
@@ -292,7 +302,7 @@ export default class HomeScreen extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
            <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>
-                {`Hello ${this.state.username} how are we today?`}
+                {`Hello ${this.state.username} how are you today?`}
             </Text>
             <View style={styles.pinInputContainer} >
   
@@ -317,10 +327,13 @@ export default class HomeScreen extends React.Component {
             You've subscribed to "{this.state.currentBroadcast.name}". Visit to location on the map to access the secret messages!!
             </Text>
             <MapView
+              ref={ map => { this.map = map }}
               style={{ flex: 1 }}
               initialRegion={
                 this.state.currentPosition   
               }
+              zoomEnabled={true}
+              provider={"google"}
             > 
             {this.state.polygons && this.renderPolygonsOnMap()}
             {/* {this.pointInPolygon(point, poly)} */}

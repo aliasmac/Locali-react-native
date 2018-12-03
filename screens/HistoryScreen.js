@@ -41,7 +41,7 @@ class HistoryScreen extends Component {
             </View>
             :
             <View style={styles.container}>
-                <Text>componentName</Text>
+                <Text>Coming Soon</Text>
             </View>
         );
     }
