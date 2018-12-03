@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
   TextInput,  
-  Button,
+  // Button,
   Dimensions,
   Modal,
   TouchableHighlight,
@@ -22,9 +22,11 @@ import { MapView } from 'expo';
 import decodeGeoCode from '../helper_functions/decodeGeoCode'
 import { Constants, Location, Permissions } from 'expo';
 import Geofence from 'react-native-expo-geofence';
+import { Button } from 'react-native-elements'
 
 import API from '../API'
 import deviceStorage from '../components/deviceStorage';
+
 
 const {width, height} = Dimensions.get('window')
 
@@ -123,21 +125,6 @@ export default class HomeScreen extends React.Component {
   }
 
  
-
-  componentDidMount() {
-    
-  }
-
-  // getUsername = async() => {
-  //       const user = await AsyncStorage.getItem('userObj')
-  //       // const user = await AsyncStorage.getItem('userObj')
-  //       this.props.navigation.navigate( user ? ('HomeScreen', { id: user.id, username: user.username } ) : 'Auth')
-  //   }
-
-
-
-  
-
 
   checkGeoFence = () => {
     console.log("Hello from checkGeoFence")
@@ -291,13 +278,6 @@ export default class HomeScreen extends React.Component {
 
     return (
 
-      // this.state.loading ? 
-
-      // <View style={styles.container}>
-      //           <ActivityIndicator />
-      //       </View> :
-
-
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
            <View style={styles.getStartedContainer}>
@@ -312,9 +292,18 @@ export default class HomeScreen extends React.Component {
                 onChangeText={this.onChangePin}
                 placeholder="Enter broadcast PIN"
               />
-              <Button style={styles.pinInputContainerBtn}
+              <Button 
                 title="Get Broadcast"
                 onPress={this.onPinSubmit}
+                activeOpacity={1}
+                underlayColor="transparent"
+                //   loading={showLoading}
+                // loadingProps={{size: 'small', color: 'white'}}
+                //   disabled={ !email_valid && password.length < 8}
+                buttonStyle={{backgroundColor: '#030056', marginTop: 6, height: 35, width: 130, borderWidth: 2, borderColor: 'white', borderRadius: 10}}
+                // containerStyle={{marginVertical: 10}}
+                titleStyle={{fontWeight: 'bold', color: 'white', fontSize: 14, }}
+                activeOpacity={0.5}
               /> 
             </View>  
           </View>
@@ -356,18 +345,40 @@ export default class HomeScreen extends React.Component {
             <Modal
             animationType="slide"
             transparent={false}
-            visible={this.state.modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
+            
+            >
             <View style={{marginTop: 22}} style={styles.modalView}  >
-              <View>
-                <Text>{this.state.currentMessage}</Text>
+              <View style={styles.modalBox} >
+              <Image source={require('../assets/images/localiLogo.png')} style={{height: 100, width: 100, marginBottom: 40,}} />
+                <Text  style={styles.modalMessageTitle}>Message Alert!</Text>
+                <Text style={styles.modalMessageText} >{this.state.currentMessage}</Text>
+                
+                  <TouchableHighlight
+                    // onPress={() => this.closeModal()}
+                    >
+                    {/* <Text style={styles.modalCloseBtn}  >
+                    Close Message</Text> */}
+                    <Button 
+                      title="Close Message"
+                      onPress={this.closeModal}
+                      activeOpacity={1}
+                      underlayColor="transparent"
+                      //   loading={showLoading}
+                      // loadingProps={{size: 'small', color: 'white'}}
+                      //   disabled={ !email_valid && password.length < 8}
+                      buttonStyle={{backgroundColor: '#6acbd5', marginTop: 6, height: 35, width: 130, borderWidth: 2,  borderColor: 'white', borderRadius: 10}}
+                      // containerStyle={{marginVertical: 10}}
+                      titleStyle={{fontWeight: 'bold', color: 'white', fontSize: 14, }}
+                      activeOpacity={0.5}
+                    /> 
 
-                <TouchableHighlight
-                  onPress={() => this.closeModal()}>
-                  <Text>Close Message</Text>
-                </TouchableHighlight>
+
+
+
+
+                    
+                  </TouchableHighlight>
+                
               </View>
             </View>
           </Modal>
@@ -382,43 +393,8 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-
-
-
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -444,93 +420,62 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     padding: 5,
   },
+
   modalView: {
+    flex: 1,
     textAlign: "center",
     marginTop: 200,
+    alignItems: "center",
   },
 
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  modalBox: {
+    flex: 1,
+    textAlign: "center",
+    alignItems: "center",
   },
+
+  modalMessageTitle: {
+    fontSize: 23,
+    color: "black",
+    lineHeight: 27,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalMessageText: {
+    fontSize: 17,
+    color: 'rgba(96,100,109, 1)',
+    lineHeight: 24,
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  modalCloseBtn: {
+    // backgroundColor: 'blue',
+  },
+
+
+
+
+
   contentContainer: {
     paddingTop: 30,
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
+  
+ 
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
   },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
+  
+  
   getStartedText: {
     fontSize: 17,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
   },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+
+
+  
 });
 
 
