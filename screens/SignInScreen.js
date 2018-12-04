@@ -36,21 +36,26 @@ export default class LoginScreen1 extends Component {
     console.log("Hello from signIn")
     const { username, password } = this.state
     API.signIn(username, password)
-        .then(user => {
-            deviceStorage.saveKey("token", user.token)
-            deviceStorage.saveKey("username", user.username)
-            console.log("SIGN IN:", user)
-            this.props.navigation.navigate('HomeScreen', { username: user.username })
-        }).catch(error => {
-            this.props.navigation.navigate('Auth')
-            this.setState({ errorMessage: "Sign in failed" })
-        })
+        .then(user => 
+          {
+            if (user.error) {
+              this.setState({
+                errorMessage: "username/password invalid"              
+              })
+              // this.props.navigation.navigate('Auth')
+            } else {
+              deviceStorage.saveKey("token", user.token)
+              deviceStorage.saveKey("username", user.username)
+              this.props.navigation.navigate('HomeScreen', { username: user.username })
+            }       
+          }
+      )   
   }
 
   
 
   render() {
-    const { username, password, email_valid } = this.state;
+    const { username, password, errorMessage } = this.state;
 
     console.log("Sign In:", username)
 
@@ -63,13 +68,6 @@ export default class LoginScreen1 extends Component {
         {/* { this.state.fontLoaded ? */}
           <View style={styles.loginView}>
             <View style={styles.loginTitle}>
-              {/* <View style={{flexDirection: 'row'}}>
-                <Text style={styles.travelText}>TRAVEL</Text>
-                <Text style={styles.plusText}>+</Text>
-              </View>
-              <View style={{marginTop: -10}}>
-                <Text style={styles.travelText}>LEISURE</Text>
-              </View> */}
               <Text style={styles.plusText}>Sign In</Text>
             </View>
             <View style={styles.loginInput}>
@@ -94,8 +92,7 @@ export default class LoginScreen1 extends Component {
                 returnKeyType="next"               
                 blurOnSubmit={false}
                 placeholderTextColor="white"
-                errorStyle={{textAlign: 'center', fontSize: 12}}
-                // errorMessage={email_valid ? null : "Please enter a valid email address"}
+                
               />
               <Input
                 leftIcon={
@@ -119,6 +116,8 @@ export default class LoginScreen1 extends Component {
                 // ref={ input => this.passwordInput = input}
                 blurOnSubmit={true}
                 placeholderTextColor="white"
+                errorStyle={{textAlign: 'center', fontSize: 12}}
+                errorMessage={errorMessage && errorMessage}
               />
             </View>
             <Button

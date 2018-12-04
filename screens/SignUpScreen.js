@@ -29,26 +29,29 @@ export default class SignUpScreen extends Component {
       header: null,
     };
 
-
     signUp = async () => {
-        console.log("Hello from SIGNUP")
-        const { username, password } = this.state
-        API.signUp(username, password)
-            .then(user =>  {
+      console.log("Hello from signIn")
+      const { username, password } = this.state
+      API.signUp(username, password)
+          .then(user => 
+            {
+              if (user.error) {
+                this.setState({
+                  errorMessage: "Username already taken"              
+                })
+                // this.props.navigation.navigate('Auth')
+              } else {
                 deviceStorage.saveKey("token", user.token)
                 deviceStorage.saveKey("username", user.username)
-                console.log(user)
                 this.props.navigation.navigate('HomeScreen', { username: user.username })
+              }       
             }
-            ).catch(error => {
-                this.props.navigation.navigate('Auth')
-                this.setState({ errorMessage: "Sign Up failed" })
-            })
+        )   
     }
 
   
     render() {
-        const { username, password, email_valid } = this.state;
+        const { username, password, errorMessage } = this.state;
     
         console.log("Sign In:", username)
     
@@ -92,8 +95,7 @@ export default class SignUpScreen extends Component {
                     returnKeyType="next"               
                     blurOnSubmit={false}
                     placeholderTextColor='white'
-                    errorStyle={{textAlign: 'center', fontSize: 12}}
-                    // errorMessage={email_valid ? null : "Please enter a valid email address"}
+                    
                   />
                   <Input
                     leftIcon={
@@ -117,6 +119,8 @@ export default class SignUpScreen extends Component {
                     // ref={ input => this.passwordInput = input}
                     blurOnSubmit={true}
                     placeholderTextColor='white'
+                    errorStyle={{textAlign: 'center', fontSize: 12}}
+                    errorMessage={errorMessage && errorMessage}
                   />
                 </View>
                 <Button
