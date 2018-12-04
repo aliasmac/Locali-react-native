@@ -24,7 +24,7 @@ import { WebBrowser } from 'expo';
 import decodeGeoCode from '../helper_functions/decodeGeoCode'
 import { Constants, Location, Permissions } from 'expo';
 import Geofence from 'react-native-expo-geofence';
-import { Button } from 'react-native-elements'
+import { Input, Button } from 'react-native-elements'
 
 import API from '../API'
 import deviceStorage from '../components/deviceStorage';
@@ -247,22 +247,21 @@ export default class HomeScreen extends React.Component {
     })
 
 
-    API.getBroadcast(this.state.broadcastPin)
-      .then(broadcast => {
-        this.getGeoFencesFromBroadCast(broadcast)
-        this.setState({ currentBroadcast: broadcast })
-        this.checkGeoFence()
+    API.getBroadcast(this.state.broadcastPin.toLowerCase())
+      .then(broadcast => 
 
-      //   Location.watchPositionAsync({
-      //     enableHighAccuracy: true,
-      //     distanceInterval: 10,
-      //   }, NewLocation => {
-      //       console.log("NEW LOCATION:", NewLocation)
-      //       let coords = NewLocation.coords;
-      //       this.getDelta(coords.latitude, coords.longitude, 1000)
-      //       this.checkGeoFence()
-    
-      //  }).then(func => this.setState({ removeWatchFunction: func }))
+        {
+          if (broadcast.error) {
+            this.setState({
+              errorMessage: "broadcast not found"              
+            })
+            // this.props.navigation.navigate('Auth')
+          } else {
+            this.getGeoFencesFromBroadCast(broadcast)
+            this.setState({ currentBroadcast: broadcast })
+            this.checkGeoFence()
+          }  
+
       })
   } 
 
@@ -280,6 +279,8 @@ export default class HomeScreen extends React.Component {
   
   render() {
 
+    const {errorMessage } = this.state;
+
     return (
 
       <View style={styles.container}>
@@ -290,12 +291,44 @@ export default class HomeScreen extends React.Component {
             </Text>
             <View style={styles.pinInputContainer} >
   
-              <TextInput
+              {/* <TextInput
                 style={{ width: 200, textAlign: "center", paddingTop: 10 }}
                 value={this.state.broadcastPin}
                 onChangeText={this.onChangePin}
-                placeholder="Enter broadcast PIN"
-              />
+                placeholder="Enter broadcast CODE"
+              /> */}
+
+              <Input
+                    // leftIcon={
+                    //   <Icon
+                    //     name='user-o'
+                    //     color='rgba(171, 189, 219, 1)'
+                    //     size={25}
+                    //   />
+                    // }
+                  containerStyle={{ width: 170}}
+                  onChangeText={this.onChangePin}
+                  value={this.state.broadcastPin}   
+                  keyboardAppearance="light"
+                  placeholder="Enter broadcast CODE"
+                  autoFocus={false}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  inputStyle={{fontSize: 15}}
+                  // keyboardType="email-address"
+                  returnKeyType="next"               
+                  blurOnSubmit={false}
+                  // placeholderTextColor='white'
+                  errorStyle={{textAlign: 'center', fontSize: 12}}
+                  errorMessage={errorMessage && errorMessage}
+                />
+
+
+
+
+
+
+
               <Button 
                 title="Get Broadcast"
                 onPress={this.onPinSubmit}
@@ -304,7 +337,7 @@ export default class HomeScreen extends React.Component {
                 //   loading={showLoading}
                 // loadingProps={{size: 'small', color: 'white'}}
                 //   disabled={ !email_valid && password.length < 8}
-                buttonStyle={{backgroundColor: '#030056', marginTop: 6, height: 35, width: 130, borderWidth: 2, borderColor: 'white', borderRadius: 10}}
+                buttonStyle={{marginLeft: 10, backgroundColor: '#030056', marginTop: 6, height: 35, width: 130, borderWidth: 2, borderColor: 'white', borderRadius: 10}}
                 // containerStyle={{marginVertical: 10}}
                 titleStyle={{fontWeight: 'bold', color: 'white', fontSize: 14, }}
                 activeOpacity={0.5}
@@ -419,7 +452,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   pinInputContainerBtn: {
-    paddingTop: 1000,
+   
     backgroundColor: "red",
   },
   mapText: {
@@ -492,6 +525,7 @@ const styles = StyleSheet.create({
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
+    marginBottom: 10,
   },
 
 
