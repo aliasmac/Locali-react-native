@@ -29,7 +29,7 @@ import SignInScreen from '../screens/SignInScreen'
 import AuthLoadingScreen from '../screens/AuthLoadingScreen'
 import SettingsScreen from '../screens/SettingsScreen'
 import HistoryScreen from '../screens/HistoryScreen'
-
+import HelpScreen from '../screens/HelpScreen'
 
 const AuthStackNavigator = createStackNavigator({
   SignIn: SignInScreen,
@@ -38,9 +38,44 @@ const AuthStackNavigator = createStackNavigator({
 
 
 const AppTabNavigator = createBottomTabNavigator({
-  HomeScreen: HomeScreen,
-  History: HistoryScreen,
+  HomeScreen: {
+    screen: HomeScreen,
+    navigationOptions: ({navigation}) => ({
+      tabBarIcon: ({ focused, tintColor }) => {
+        return <Ionicons name="ios-home" size={37} color={tintColor} />;
+    }
+  })
+  }, 
+  History: {
+    screen: HistoryScreen,
+    navigationOptions: ({navigation}) => ({
+      tabBarIcon: ({ focused, tintColor }) => {
+        return <Ionicons name="ios-archive" size={37} color={tintColor} />;
+    }
+  })
+  }, 
+  Help: {
+    screen: HelpScreen,
+    navigationOptions: ({navigation}) => ({
+      tabBarIcon: ({ focused, tintColor }) => {
+        return <Ionicons name="ios-help-circle-outline" size={37} color={tintColor} />;
+    }
+  })
+  }
+}, {
+  tabBarOptions: {
+    activeTintColor: '#6acbd5',
+    style: {
+      backgroundColor: '#030056',
+      height: 70,
+      padding: 10,
+    },
+    showLabel: false,
+  },
+ 
+  
 })
+
 
 const AppStackNavigator = createStackNavigator({
   AppTabNavigator: {
@@ -50,7 +85,7 @@ const AppStackNavigator = createStackNavigator({
       headerLeft: 
       (
         <TouchableOpacity onPress={() => navigation.toggleDrawer()} >
-          <View style={{ paddingHorizontal: 10 }}>
+          <View style={{ paddingHorizontal: 20 }}>
             <Ionicons name="md-menu" size={32} />
           </View>
         </TouchableOpacity >
@@ -101,7 +136,6 @@ const AppDrawerNavigator = createDrawerNavigator(
   }
 
 )
-
 
 
 export default createSwitchNavigator({

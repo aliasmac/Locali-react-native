@@ -16,9 +16,11 @@ import {
   Alert,
   ActivityIndicator,
   AsyncStorage,
+  Marker,
 } from 'react-native';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 import { WebBrowser } from 'expo';
-import { MapView } from 'expo';
+// import { MapView } from 'expo';
 import decodeGeoCode from '../helper_functions/decodeGeoCode'
 import { Constants, Location, Permissions } from 'expo';
 import Geofence from 'react-native-expo-geofence';
@@ -33,6 +35,7 @@ const {width, height} = Dimensions.get('window')
 const ASPECT_RATIO = width / height
 const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
+
 
 
 
@@ -124,7 +127,7 @@ export default class HomeScreen extends React.Component {
     this.setState({ username })
   }
 
- 
+
 
   checkGeoFence = () => {
     console.log("Hello from checkGeoFence")
@@ -152,7 +155,6 @@ export default class HomeScreen extends React.Component {
         })
 
         const checkIfInPolygon = this.pointInPolygon(point, expectedPoly)
-
         // console.log("[checkGeoFence]:", checkIfInPolygon)
 
         if (checkIfInPolygon) {
@@ -218,7 +220,9 @@ export default class HomeScreen extends React.Component {
       <MapView.Polygon
         key={idx}
         coordinates={polygon}
-        fillColor='rgba(1,180,225,0.3)'
+        fillColor='rgba(105,202,211,0.4)'
+        strokeColor='rgba(105,202,211,0.9)'
+        lineDashPattern={[47.12]}
       />
     )
   )}
@@ -315,25 +319,35 @@ export default class HomeScreen extends React.Component {
             <Text style={styles.mapText}>
             You've subscribed to "{this.state.currentBroadcast.name}". Visit to location on the map to access the secret messages!!
             </Text>
+            <View style={styles.mapStyle} >
             <MapView
               ref={ map => { this.map = map }}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
+              style={{flex: 1}}
               initialRegion={
                 this.state.currentPosition   
               }
+              customMapStyle={mapStyle}
               zoomEnabled={true}
-              provider={"google"}
+              provider={PROVIDER_GOOGLE }
             > 
             {this.state.polygons && this.renderPolygonsOnMap()}
             {/* {this.pointInPolygon(point, poly)} */}
             {/* {this.test()} */}
               <MapView.Marker
                 coordinate={this.marker()}
-                title="You"
-                description="You are here!"
-                pinColor='green'
+                // title="You"
+                // description="You are here!"
+                image={require('./marker.png')}
+                // pinColor='green'
+                flat={true}
+                // style={styles.markerStyle}
+                
               />
+              {/* <View style={styles.markerStyle} >
+              </View> */}
             </MapView>
+            </View>
            </>
         }
 
@@ -371,11 +385,6 @@ export default class HomeScreen extends React.Component {
                       titleStyle={{fontWeight: 'bold', color: 'white', fontSize: 14, }}
                       activeOpacity={0.5}
                     /> 
-
-
-
-
-
                     
                   </TouchableHighlight>
                 
@@ -394,6 +403,7 @@ export default class HomeScreen extends React.Component {
   }
 
 }
+
 
 
 const styles = StyleSheet.create({
@@ -451,7 +461,17 @@ const styles = StyleSheet.create({
   modalCloseBtn: {
     // backgroundColor: 'blue',
   },
-
+  markerStyle: {
+      width: 44,
+      height: 44,
+      borderRadius: 44/2
+  },
+  mapStyle: {
+    flex: 1,
+    paddingBottom: 20,
+    paddingTop: 20,
+    backgroundColor: '#030056',
+  },
 
 
 
@@ -479,3 +499,236 @@ const styles = StyleSheet.create({
 });
 
 
+mapStyle = [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#1d2c4d"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#8ec3b9"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#1a3646"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.country",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#4b6878"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#64779e"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.province",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#4b6878"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.man_made",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#334e87"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#023e58"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#283d6a"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#6f9ba5"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#1d2c4d"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#023e58"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#3C7680"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#304a7d"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#98a5be"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#1d2c4d"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#2c6675"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#255763"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#b0d5ce"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#023e58"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#98a5be"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#1d2c4d"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#283d6a"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#3a4762"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#0e1626"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#4e6d70"
+      }
+    ]
+  }
+]

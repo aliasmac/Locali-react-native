@@ -26,6 +26,10 @@ export default class LoginScreen1 extends Component {
         // showLoading: false
         };
     }
+
+    static navigationOptions = {
+      header: null,
+    };
     
 
   signIn = async () => {

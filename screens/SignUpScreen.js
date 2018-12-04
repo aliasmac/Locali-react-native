@@ -25,6 +25,11 @@ export default class SignUpScreen extends Component {
         };
     }
 
+    static navigationOptions = {
+      header: null,
+    };
+
+
     signUp = async () => {
         console.log("Hello from SIGNUP")
         const { username, password } = this.state
