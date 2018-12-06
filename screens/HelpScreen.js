@@ -9,7 +9,7 @@ class HelpScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>HelpScreen</Text>
+                <Text>Coming Soon.</Text>
             </View>
         );
     }

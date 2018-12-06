@@ -1,7 +1,7 @@
 class API {
 
     static getBroadcast (code) {
-        return fetch(`http://bc632a91.ngrok.io/api/v1/broadcastbypin`, {
+        return fetch(`http://b8ba227a.ngrok.io/api/v1/broadcastbypin`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -12,7 +12,7 @@ class API {
 
     static signIn (username, password) {
       // console.log("HELLO FROM LOGIN IN API.js", obj)
-        return fetch('http://bc632a91.ngrok.io/api/v1/login', {
+        return fetch('http://b8ba227a.ngrok.io/api/v1/login', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -23,7 +23,7 @@ class API {
     }
 
     static signUp (username, password) {
-      return fetch('http://bc632a91.ngrok.io/api/v1/users', {
+      return fetch('http://b8ba227a.ngrok.io/api/v1/users', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

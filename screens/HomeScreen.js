@@ -25,6 +25,7 @@ import decodeGeoCode from '../helper_functions/decodeGeoCode'
 import { Constants, Location, Permissions } from 'expo';
 import Geofence from 'react-native-expo-geofence';
 import { Input, Button } from 'react-native-elements'
+var _ = require('lodash');
 
 import API from '../API'
 import deviceStorage from '../components/deviceStorage';
@@ -67,7 +68,7 @@ export default class HomeScreen extends React.Component {
       username: null,
       userId: null,
       loading: true,
-    };
+    }
 
   }
 
@@ -79,8 +80,8 @@ export default class HomeScreen extends React.Component {
   
     this.setState({
       currentPosition: {
-        latitude: lat,
-        longitude: long,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(long),
         latitudeDelta,
         longitudeDelta,
         },
@@ -103,12 +104,10 @@ export default class HomeScreen extends React.Component {
                       (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
       if (intersect) inside = !inside
     }
-
     // console.log("POINT IN POLYGON?", inside)
     return inside
   }
 
-  
   /////////////////////////////////////////////
 
   componentWillMount() {
@@ -232,11 +231,11 @@ export default class HomeScreen extends React.Component {
   }
 
   onPinSubmit = () => {
-
     // so that we can set new broadcast
     if (this.state.currentBroadcast) {
       this.setState({
         currentBroadcast: null,
+        
         // polygons: null,
       })
     }
@@ -244,6 +243,7 @@ export default class HomeScreen extends React.Component {
     this.setState({ 
       broadcastPin: "",
       polygons: [],
+      errorMessage: null,
     })
 
 
@@ -262,7 +262,7 @@ export default class HomeScreen extends React.Component {
             this.checkGeoFence()
           }  
 
-      })
+      }).catch(err => console.log(err))
   } 
 
   marker(){
@@ -287,7 +287,7 @@ export default class HomeScreen extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
            <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>
-                {`Hello ${this.state.username} how are you today?`}
+                {`Hello ${_.capitalize(this.state.username)}, how are you today?`}
             </Text>
             <View style={styles.pinInputContainer} >
   
@@ -310,7 +310,7 @@ export default class HomeScreen extends React.Component {
                   onChangeText={this.onChangePin}
                   value={this.state.broadcastPin}   
                   keyboardAppearance="light"
-                  placeholder="Enter broadcast CODE"
+                  placeholder="Enter broadcast code"
                   autoFocus={false}
                   autoCapitalize="none"
                   autoCorrect={false}
